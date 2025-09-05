@@ -6,8 +6,11 @@
 @section('content')
     <!-- Hero Section -->
     <section class="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 text-white overflow-hidden">
-        <div class="absolute inset-0 bg-black opacity-20"></div>
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+        <!-- Canvas de partículas -->
+        <canvas id="particles-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+        
+        <div class="absolute inset-0 bg-black opacity-20 z-10"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 z-20">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
                     <h1 class="text-4xl lg:text-6xl font-bold leading-tight mb-6">
@@ -271,4 +274,178 @@
             </a>
         </div>
     </section>
+
+    <!-- Sistema de Partículas -->
+    <script>
+        // Sistema de partículas que siguen al mouse
+        class ParticleSystem {
+            constructor() {
+                this.canvas = document.getElementById('particles-canvas');
+                if (!this.canvas) return;
+                
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.renderer = new THREE.WebGLRenderer({ 
+                    canvas: this.canvas, 
+                    alpha: true, 
+                    antialias: true 
+                });
+                
+                this.mouse = new THREE.Vector2();
+                this.particles = [];
+                this.particleCount = 300;
+                this.mouseInfluence = 0.3;
+                
+                this.init();
+                this.animate();
+                this.setupEventListeners();
+            }
+            
+            init() {
+                // Configurar renderer
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setClearColor(0x000000, 0);
+                
+                // Crear partículas
+                this.createParticles();
+                
+                // Posicionar cámara
+                this.camera.position.z = 5;
+            }
+            
+            createParticles() {
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(this.particleCount * 3);
+                const colors = new Float32Array(this.particleCount * 3);
+                const sizes = new Float32Array(this.particleCount);
+                
+                // Crear forma abstracta (similar a un cerebro o red de datos)
+                for (let i = 0; i < this.particleCount; i++) {
+                    const i3 = i * 3;
+                    
+                    // Crear forma orgánica con múltiples capas
+                    const layer = Math.floor(i / (this.particleCount / 4));
+                    const radius = 1.5 + layer * 0.8 + Math.random() * 0.5;
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.random() * Math.PI;
+                    
+                    positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
+                    positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+                    positions[i3 + 2] = radius * Math.cos(phi);
+                    
+                    // Colores que van del verde al amarillo (como en la imagen)
+                    const colorIntensity = Math.random();
+                    const greenIntensity = 0.3 + colorIntensity * 0.7;
+                    const yellowIntensity = 0.6 + colorIntensity * 0.4;
+                    
+                    colors[i3] = 0.1; // Rojo mínimo
+                    colors[i3 + 1] = greenIntensity; // Verde dominante
+                    colors[i3 + 2] = yellowIntensity * 0.3; // Azul para el amarillo
+                    
+                    // Tamaños variables
+                    sizes[i] = 0.5 + Math.random() * 1.5;
+                }
+                
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+                geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+                
+                const material = new THREE.PointsMaterial({
+                    size: 0.05,
+                    vertexColors: true,
+                    transparent: true,
+                    opacity: 0.8,
+                    sizeAttenuation: true
+                });
+                
+                this.particleSystem = new THREE.Points(geometry, material);
+                this.scene.add(this.particleSystem);
+                
+                // Guardar posiciones originales
+                this.originalPositions = positions.slice();
+                this.originalColors = colors.slice();
+            }
+            
+            setupEventListeners() {
+                window.addEventListener('mousemove', (event) => {
+                    this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                    this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                });
+                
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+                
+                // Pausar animación cuando la ventana no está visible
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        this.paused = true;
+                    } else {
+                        this.paused = false;
+                    }
+                });
+            }
+            
+            animate() {
+                if (this.paused) {
+                    requestAnimationFrame(() => this.animate());
+                    return;
+                }
+                
+                requestAnimationFrame(() => this.animate());
+                
+                if (this.particleSystem) {
+                    const positions = this.particleSystem.geometry.attributes.position.array;
+                    const colors = this.particleSystem.geometry.attributes.color.array;
+                    const time = Date.now() * 0.001;
+                    
+                    for (let i = 0; i < this.particleCount; i++) {
+                        const i3 = i * 3;
+                        
+                        // Posición original
+                        const originalX = this.originalPositions[i3];
+                        const originalY = this.originalPositions[i3 + 1];
+                        const originalZ = this.originalPositions[i3 + 2];
+                        
+                        // Influencia del mouse con suavizado
+                        const mouseInfluence = this.mouseInfluence;
+                        const mouseX = this.mouse.x * mouseInfluence;
+                        const mouseY = this.mouse.y * mouseInfluence;
+                        
+                        // Movimiento orgánico y suave
+                        const wave1 = Math.sin(time * 0.5 + i * 0.01) * 0.1;
+                        const wave2 = Math.cos(time * 0.3 + i * 0.02) * 0.05;
+                        const wave3 = Math.sin(time * 0.7 + i * 0.015) * 0.08;
+                        
+                        positions[i3] = originalX + mouseX + wave1;
+                        positions[i3 + 1] = originalY + mouseY + wave2;
+                        positions[i3 + 2] = originalZ + wave3;
+                        
+                        // Efecto de brillo pulsante
+                        const pulse = 0.8 + Math.sin(time * 2 + i * 0.1) * 0.2;
+                        colors[i3 + 1] = this.originalColors[i3 + 1] * pulse;
+                    }
+                    
+                    this.particleSystem.geometry.attributes.position.needsUpdate = true;
+                    this.particleSystem.geometry.attributes.color.needsUpdate = true;
+                    
+                    // Rotación lenta del sistema completo
+                    this.particleSystem.rotation.y += 0.0005;
+                    this.particleSystem.rotation.x += 0.0002;
+                }
+                
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+        
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', () => {
+            // Solo inicializar en la página de inicio
+            if (window.location.pathname === '/' || window.location.pathname === '/home') {
+                new ParticleSystem();
+            }
+        });
+    </script>
 @endsection

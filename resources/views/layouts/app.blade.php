@@ -26,6 +26,9 @@
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
     <!-- Heroicons -->
     <script src="https://unpkg.com/@heroicons/v2/24/outline/esm/index.js"></script>
 </head>

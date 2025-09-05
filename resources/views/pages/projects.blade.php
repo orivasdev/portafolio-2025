@@ -20,23 +20,18 @@
     <!-- Filters Section -->
     <section class="py-12 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div x-data="{ 
-                selectedCategory: '{{ request('category', 'all') }}',
-                selectedTechnology: '{{ request('technology', '') }}'
-            }" class="space-y-6">
+            <div x-data="projectFilters()" class="space-y-6">
                 <!-- Category Filter -->
                 <div>
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Filtrar por Categoría</h3>
                     <div class="flex flex-wrap gap-3">
-                        <button @click="selectedCategory = 'all'; selectedTechnology = ''" 
-                                @click="$dispatch('filter-projects')"
+                        <button @click="setCategory('all')" 
                                 :class="selectedCategory === 'all' ? 'bg-primary-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
                                 class="px-4 py-2 rounded-lg font-medium transition-colors duration-200 hover:bg-primary-600 hover:text-white">
                             Todos
                         </button>
                         @foreach($categories as $category)
-                        <button @click="selectedCategory = '{{ $category }}'; selectedTechnology = ''" 
-                                @click="$dispatch('filter-projects')"
+                        <button @click="setCategory('{{ $category }}')" 
                                 :class="selectedCategory === '{{ $category }}' ? 'bg-primary-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
                                 class="px-4 py-2 rounded-lg font-medium transition-colors duration-200 hover:bg-primary-600 hover:text-white">
                             {{ $category }}
@@ -45,38 +40,14 @@
                     </div>
                 </div>
 
-                <!-- Technology Filter -->
-                <div>
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Filtrar por Tecnología</h3>
-                    <div class="flex flex-wrap gap-3">
-                        @foreach($technologies as $tech)
-                        <button @click="selectedTechnology = '{{ $tech }}'" 
-                                @click="$dispatch('filter-projects')"
-                                :class="selectedTechnology === '{{ $tech }}' ? 'bg-primary-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
-                                class="px-4 py-2 rounded-lg font-medium transition-colors duration-200 hover:bg-primary-600 hover:text-white">
-                            {{ $tech }}
-                        </button>
-                        @endforeach
-                    </div>
-                </div>
 
                 <!-- Active Filters Display -->
-                <div x-show="selectedCategory !== 'all' || selectedTechnology !== ''" class="flex items-center gap-4">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">Filtros activos:</span>
+                <div x-show="selectedCategory !== 'all'" class="flex items-center gap-4">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Filtro activo:</span>
                     <div class="flex gap-2">
-                        <span x-show="selectedCategory !== 'all'" 
-                              class="inline-flex items-center px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 text-sm rounded-full">
-                            Categoría: {{ request('category', 'all') !== 'all' ? request('category') : '' }}
-                            <button @click="selectedCategory = 'all'" class="ml-2 text-primary-600 hover:text-primary-800">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        </span>
-                        <span x-show="selectedTechnology !== ''" 
-                              class="inline-flex items-center px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 text-sm rounded-full">
-                            Tecnología: {{ request('technology') }}
-                            <button @click="selectedTechnology = ''" class="ml-2 text-primary-600 hover:text-primary-800">
+                        <span class="inline-flex items-center px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 text-sm rounded-full">
+                            Categoría: <span x-text="selectedCategory"></span>
+                            <button @click="setCategory('all')" class="ml-2 text-primary-600 hover:text-primary-800">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
@@ -220,15 +191,17 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('projectFilters', () => ({
                 selectedCategory: '{{ request('category', 'all') }}',
-                selectedTechnology: '{{ request('technology', '') }}',
                 
-                filterProjects() {
+                setCategory(category) {
+                    this.selectedCategory = category;
+                    this.applyFilters();
+                },
+                
+                applyFilters() {
                     const params = new URLSearchParams();
+                    
                     if (this.selectedCategory !== 'all') {
                         params.append('category', this.selectedCategory);
-                    }
-                    if (this.selectedTechnology) {
-                        params.append('technology', this.selectedTechnology);
                     }
                     
                     const url = new URL(window.location);

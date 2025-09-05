@@ -35,20 +35,11 @@ class HomeController extends Controller
             $query->byCategory($request->category);
         }
 
-        if ($request->has('technology')) {
-            $query->whereJsonContains('technologies', $request->technology);
-        }
 
         $projects = $query->paginate(12);
         $categories = Project::active()->distinct()->pluck('category');
-        $technologies = $this->getAllTechnologies();
 
-        return view('pages.projects', compact('projects', 'categories', 'technologies'));
+        return view('pages.projects', compact('projects', 'categories'));
     }
 
-    private function getAllTechnologies(): array
-    {
-        $technologies = Project::active()->pluck('technologies')->flatten()->unique()->sort()->values();
-        return $technologies->toArray();
-    }
 }
