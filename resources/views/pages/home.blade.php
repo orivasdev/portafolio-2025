@@ -12,7 +12,7 @@
         <div class="absolute inset-0 bg-black opacity-20 z-10"></div>
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 z-20">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div>
+                <div id="hero-content" class="opacity-0 transform translate-y-8 transition-all duration-1000 ease-out" style="visibility: hidden;">
                     <h1 class="text-4xl lg:text-6xl font-bold leading-tight mb-6">
                         Desarrollador 
                         <span class="text-primary-200">Backend</span>
@@ -36,7 +36,7 @@
                         </a>
                     </div>
                 </div>
-                <div class="hidden lg:block">
+                <div id="hero-visual" class="hidden lg:block opacity-0 transform translate-y-8 transition-all duration-1000 ease-out delay-300" style="visibility: hidden;">
                     <div class="relative">
                         <div class="w-96 h-96 bg-primary-500 rounded-full opacity-20 animate-pulse"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
@@ -55,7 +55,7 @@
         </div>
         
         <!-- Scroll indicator -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+        <div id="scroll-indicator" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 transition-all duration-1000 ease-out delay-500" style="visibility: hidden;">
             <div class="animate-bounce">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
@@ -65,8 +65,11 @@
     </section>
 
     <!-- Skills Section -->
-    <section class="py-20 bg-white dark:bg-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="py-20 bg-white dark:bg-gray-800 relative overflow-hidden">
+        <!-- Canvas para efectos de habilidades -->
+        <canvas id="skills-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-16">
                 <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                     Habilidades Técnicas
@@ -122,8 +125,11 @@
     </section>
 
     <!-- Featured Projects Section -->
-    <section class="py-20 bg-gray-50 dark:bg-gray-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="py-20 bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
+        <!-- Canvas para efectos de proyectos -->
+        <canvas id="projects-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-16">
                 <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                     Proyectos Destacados
@@ -205,8 +211,11 @@
     </section>
 
     <!-- Experience Section -->
-    <section class="py-20 bg-white dark:bg-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="py-20 bg-white dark:bg-gray-800 relative overflow-hidden">
+        <!-- Canvas para efectos de experiencia -->
+        <canvas id="experience-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-16">
                 <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                     Experiencia Laboral
@@ -256,8 +265,11 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-20 bg-primary-500 text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <section class="py-20 bg-primary-500 text-white relative overflow-hidden">
+        <!-- Canvas para efectos de CTA -->
+        <canvas id="cta-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
             <h2 class="text-3xl lg:text-4xl font-bold mb-6">
                 ¿Tienes un proyecto en mente?
             </h2>
@@ -275,176 +287,647 @@
         </div>
     </section>
 
-    <!-- Sistema de Partículas -->
+    <!-- Sistema de Animaciones Three.js Avanzado con Shaders y Keyframes -->
     <script>
-        // Sistema de partículas que siguen al mouse
-        class ParticleSystem {
+        // Sistema avanzado de animaciones con shaders personalizados y keyframes
+        class AdvancedThreeJSAnimationSystem {
             constructor() {
-                this.canvas = document.getElementById('particles-canvas');
-                if (!this.canvas) return;
-                
-                this.scene = new THREE.Scene();
-                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                this.renderer = new THREE.WebGLRenderer({ 
-                    canvas: this.canvas, 
-                    alpha: true, 
-                    antialias: true 
-                });
-                
+                this.systems = {};
                 this.mouse = new THREE.Vector2();
-                this.particles = [];
-                this.particleCount = 300;
-                this.mouseInfluence = 0.3;
+                this.mouseTarget = new THREE.Vector2();
+                this.time = 0;
+                this.clock = new THREE.Clock();
+                this.animationMixers = [];
+                this.composer = null;
+                this.renderTarget = null;
+                this.contentShown = false;
                 
                 this.init();
-                this.animate();
-                this.setupEventListeners();
             }
             
             init() {
-                // Configurar renderer
-                this.renderer.setSize(window.innerWidth, window.innerHeight);
-                this.renderer.setClearColor(0x000000, 0);
-                
-                // Crear partículas
-                this.createParticles();
-                
-                // Posicionar cámara
-                this.camera.position.z = 5;
-            }
-            
-            createParticles() {
-                const geometry = new THREE.BufferGeometry();
-                const positions = new Float32Array(this.particleCount * 3);
-                const colors = new Float32Array(this.particleCount * 3);
-                const sizes = new Float32Array(this.particleCount);
-                
-                // Crear forma abstracta (similar a un cerebro o red de datos)
-                for (let i = 0; i < this.particleCount; i++) {
-                    const i3 = i * 3;
-                    
-                    // Crear forma orgánica con múltiples capas
-                    const layer = Math.floor(i / (this.particleCount / 4));
-                    const radius = 1.5 + layer * 0.8 + Math.random() * 0.5;
-                    const theta = Math.random() * Math.PI * 2;
-                    const phi = Math.random() * Math.PI;
-                    
-                    positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
-                    positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-                    positions[i3 + 2] = radius * Math.cos(phi);
-                    
-                    // Colores que van del verde al amarillo (como en la imagen)
-                    const colorIntensity = Math.random();
-                    const greenIntensity = 0.3 + colorIntensity * 0.7;
-                    const yellowIntensity = 0.6 + colorIntensity * 0.4;
-                    
-                    colors[i3] = 0.1; // Rojo mínimo
-                    colors[i3 + 1] = greenIntensity; // Verde dominante
-                    colors[i3 + 2] = yellowIntensity * 0.3; // Azul para el amarillo
-                    
-                    // Tamaños variables
-                    sizes[i] = 0.5 + Math.random() * 1.5;
-                }
-                
-                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-                geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-                
-                const material = new THREE.PointsMaterial({
-                    size: 0.05,
-                    vertexColors: true,
-                    transparent: true,
-                    opacity: 0.8,
-                    sizeAttenuation: true
-                });
-                
-                this.particleSystem = new THREE.Points(geometry, material);
-                this.scene.add(this.particleSystem);
-                
-                // Guardar posiciones originales
-                this.originalPositions = positions.slice();
-                this.originalColors = colors.slice();
+                this.setupEventListeners();
+                this.createShaderMaterials();
+                this.createHeroSystem();
+                this.createSkillsSystem();
+                this.createProjectsSystem();
+                this.createExperienceSystem();
+                this.createCTASystem();
+                this.setupPostProcessing();
+                this.animate();
             }
             
             setupEventListeners() {
                 window.addEventListener('mousemove', (event) => {
-                    this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                    this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                    this.mouseTarget.x = (event.clientX / window.innerWidth) * 2 - 1;
+                    this.mouseTarget.y = -(event.clientY / window.innerHeight) * 2 + 1;
                 });
                 
                 window.addEventListener('resize', () => {
-                    this.camera.aspect = window.innerWidth / window.innerHeight;
-                    this.camera.updateProjectionMatrix();
-                    this.renderer.setSize(window.innerWidth, window.innerHeight);
-                });
-                
-                // Pausar animación cuando la ventana no está visible
-                document.addEventListener('visibilitychange', () => {
-                    if (document.hidden) {
-                        this.paused = true;
-                    } else {
-                        this.paused = false;
-                    }
+                    Object.values(this.systems).forEach(system => {
+                        if (system.camera && system.renderer) {
+                            system.camera.aspect = window.innerWidth / window.innerHeight;
+                            system.camera.updateProjectionMatrix();
+                            system.renderer.setSize(window.innerWidth, window.innerHeight);
+                        }
+                    });
                 });
             }
             
-            animate() {
-                if (this.paused) {
-                    requestAnimationFrame(() => this.animate());
-                    return;
+            createShaderMaterials() {
+                // Shader personalizado para partículas con efectos de brillo y transiciones
+                this.particleShader = {
+                    vertexShader: `
+                        attribute float size;
+                        attribute float alpha;
+                        attribute vec3 color;
+                        varying float vAlpha;
+                        varying vec3 vColor;
+                        uniform float time;
+                        uniform vec2 mouse;
+                        uniform float transition;
+                        
+                        void main() {
+                            vAlpha = alpha;
+                            vColor = color;
+                            
+                            vec3 pos = position;
+                            
+                            // Efecto de mouse más pronunciado
+                            float mouseInfluence = 0.8;
+                            pos.x += mouse.x * mouseInfluence * transition;
+                            pos.y += mouse.y * mouseInfluence * transition;
+                            
+                            // Ondas orgánicas cuando está en modo disperso
+                            if (transition > 0.1) {
+                                pos.x += sin(time * 0.5 + position.y * 0.02) * 0.3 * transition;
+                                pos.y += cos(time * 0.3 + position.x * 0.02) * 0.2 * transition;
+                                pos.z += sin(time * 0.7 + position.x * 0.03) * 0.1 * transition;
+                            }
+                            
+                            vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                            gl_PointSize = size * (300.0 / -mvPosition.z) * (1.0 + transition * 0.5);
+                            gl_Position = projectionMatrix * mvPosition;
+                        }
+                    `,
+                    fragmentShader: `
+                        varying float vAlpha;
+                        varying vec3 vColor;
+                        uniform float time;
+                        uniform float transition;
+                        
+                        void main() {
+                            float distance = length(gl_PointCoord - vec2(0.5));
+                            float alpha = 1.0 - smoothstep(0.0, 0.4, distance);
+                            alpha *= vAlpha;
+                            
+                            // Efecto de brillo más intenso y visible
+                            vec3 finalColor = vColor;
+                            finalColor += sin(time * 2.0 + transition * 3.0) * 0.3;
+                            finalColor += transition * 0.4; // Más brillo cuando está disperso
+                            finalColor *= 1.5; // Aumentar brillo general
+                            
+                            // Efecto de halo para mayor visibilidad
+                            float halo = 1.0 - smoothstep(0.0, 0.8, distance);
+                            finalColor += halo * 0.2;
+                            
+                            gl_FragColor = vec4(finalColor, alpha);
+                        }
+                    `
+                };
+                
+                // Shader para efectos de ondas
+                this.waveShader = {
+                    vertexShader: `
+                        uniform float time;
+                        uniform float amplitude;
+                        varying vec2 vUv;
+                        varying float vElevation;
+                        
+                        void main() {
+                            vUv = uv;
+                            vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+                            
+                            float elevation = sin(modelPosition.x * 0.1 + time) * amplitude;
+                            elevation += sin(modelPosition.z * 0.1 + time * 0.5) * amplitude * 0.5;
+                            
+                            modelPosition.y += elevation;
+                            vElevation = elevation;
+                            
+                            vec4 viewPosition = viewMatrix * modelPosition;
+                            vec4 projectedPosition = projectionMatrix * viewPosition;
+                            gl_Position = projectedPosition;
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform vec3 color1;
+                        uniform vec3 color2;
+                        uniform float time;
+                        varying vec2 vUv;
+                        varying float vElevation;
+                        
+                        void main() {
+                            vec3 color = mix(color1, color2, vElevation * 0.5 + 0.5);
+                            color += sin(time + vUv.x * 10.0) * 0.1;
+                            gl_FragColor = vec4(color, 0.8);
+                        }
+                    `
+                };
+            }
+            
+            createHeroSystem() {
+                const canvas = document.getElementById('particles-canvas');
+                if (!canvas) return;
+                
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.position.z = 5;
+                
+                // Crear partículas que formen el texto "ORIVASDEV"
+                const textParticles = this.createTextParticles("ORIVASDEV");
+                const particleCount = textParticles.length;
+                
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(particleCount * 3);
+                const colors = new Float32Array(particleCount * 3);
+                const sizes = new Float32Array(particleCount);
+                const alphas = new Float32Array(particleCount);
+                const targetPositions = new Float32Array(particleCount * 3);
+                const originalPositions = new Float32Array(particleCount * 3);
+                
+                // Configurar partículas basadas en el texto
+                textParticles.forEach((particle, i) => {
+                    const i3 = i * 3;
+                    
+                    // Posición inicial del texto
+                    originalPositions[i3] = particle.x;
+                    originalPositions[i3 + 1] = particle.y;
+                    originalPositions[i3 + 2] = particle.z;
+                    
+                    // Posición actual (inicialmente igual a la original)
+                    positions[i3] = particle.x;
+                    positions[i3 + 1] = particle.y;
+                    positions[i3 + 2] = particle.z;
+                    
+                    // Posición objetivo (inicialmente igual a la original)
+                    targetPositions[i3] = particle.x;
+                    targetPositions[i3 + 1] = particle.y;
+                    targetPositions[i3 + 2] = particle.z;
+                    
+                    // Colores verde-amarillo más vibrantes como en la imagen
+                    colors[i3] = 0.2 + Math.random() * 0.2; // R más rojo
+                    colors[i3 + 1] = 0.8 + Math.random() * 0.2; // G más verde brillante
+                    colors[i3 + 2] = 0.3 + Math.random() * 0.4; // B más azul
+                    
+                    sizes[i] = 0.05 + Math.random() * 0.03; // Partículas más grandes
+                    alphas[i] = 0.9 + Math.random() * 0.1; // Más opacas
+                });
+                
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+                geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+                geometry.setAttribute('alpha', new THREE.BufferAttribute(alphas, 1));
+                
+                const material = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0 },
+                        mouse: { value: new THREE.Vector2() },
+                        transition: { value: 0 }
+                    },
+                    vertexShader: this.particleShader.vertexShader,
+                    fragmentShader: this.particleShader.fragmentShader,
+                    transparent: true,
+                    blending: THREE.AdditiveBlending
+                });
+                
+                const particleSystem = new THREE.Points(geometry, material);
+                scene.add(particleSystem);
+                
+                this.systems.hero = {
+                    scene, camera, renderer, particleSystem,
+                    positions, targetPositions, originalPositions,
+                    colors, sizes, alphas, material,
+                    transitionTime: 0,
+                    isTransitioning: false,
+                    particleCount
+                };
+            }
+            
+            createTextParticles(text) {
+                const particles = [];
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 1200;
+                canvas.height = 300;
+                
+                // Configurar el texto con mejor visibilidad
+                ctx.font = 'bold 180px Arial, sans-serif';
+                ctx.fillStyle = 'white';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 4;
+                
+                // Dibujar el texto con contorno para mayor visibilidad
+                ctx.strokeText(text, canvas.width / 2, canvas.height / 2);
+                ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+                
+                // Extraer píxeles del texto con mayor densidad
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+                
+                // Crear partículas más densas y visibles
+                for (let x = 0; x < canvas.width; x += 2) { // Reducido de 4 a 2 para más densidad
+                    for (let y = 0; y < canvas.height; y += 2) {
+                        const index = (y * canvas.width + x) * 4;
+                        const alpha = data[index + 3];
+                        
+                        if (alpha > 50) { // Reducido el umbral para capturar más píxeles
+                            const particleX = (x - canvas.width / 2) * 0.008; // Ajustado el tamaño
+                            const particleY = -(y - canvas.height / 2) * 0.008;
+                            const particleZ = (Math.random() - 0.5) * 0.3; // Menos dispersión en Z
+                            
+                            particles.push({
+                                x: particleX,
+                                y: particleY,
+                                z: particleZ
+                            });
+                        }
+                    }
                 }
                 
+                return particles;
+            }
+            
+            easeInOutCubic(t) {
+                return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            }
+            
+            showHeroContent() {
+                if (this.contentShown) return;
+                this.contentShown = true;
+                
+                // Efecto dramático: mostrar contenido principal con delay
+                setTimeout(() => {
+                    const heroContent = document.getElementById('hero-content');
+                    if (heroContent) {
+                        heroContent.style.visibility = 'visible';
+                        heroContent.style.opacity = '1';
+                        heroContent.style.transform = 'translateY(0)';
+                    }
+                }, 500); // Delay de 500ms después de que termine la dispersión
+                
+                // Mostrar visual con delay más largo
+                setTimeout(() => {
+                    const heroVisual = document.getElementById('hero-visual');
+                    if (heroVisual) {
+                        heroVisual.style.visibility = 'visible';
+                        heroVisual.style.opacity = '1';
+                        heroVisual.style.transform = 'translateY(0)';
+                    }
+                }, 800); // Delay de 800ms
+                
+                // Mostrar scroll indicator al final
+                setTimeout(() => {
+                    const scrollIndicator = document.getElementById('scroll-indicator');
+                    if (scrollIndicator) {
+                        scrollIndicator.style.visibility = 'visible';
+                        scrollIndicator.style.opacity = '1';
+                    }
+                }, 1200); // Delay de 1200ms
+            }
+            
+            createSkillsSystem() {
+                const canvas = document.getElementById('skills-canvas');
+                if (!canvas) return;
+                
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.position.z = 8;
+                
+                // Crear elementos flotantes para habilidades
+                const skillElements = [];
+                for (let i = 0; i < 15; i++) {
+                    const geometry = new THREE.OctahedronGeometry(0.05, 0);
+                    const material = new THREE.MeshBasicMaterial({
+                        color: 0x3b82f6,
+                        transparent: true,
+                        opacity: 0.6
+                    });
+                    
+                    const mesh = new THREE.Mesh(geometry, material);
+                    mesh.position.set(
+                        (Math.random() - 0.5) * 20,
+                        (Math.random() - 0.5) * 20,
+                        (Math.random() - 0.5) * 20
+                    );
+                    
+                    scene.add(mesh);
+                    skillElements.push(mesh);
+                }
+                
+                this.systems.skills = {
+                    scene, camera, renderer, skillElements
+                };
+            }
+            
+            createProjectsSystem() {
+                const canvas = document.getElementById('projects-canvas');
+                if (!canvas) return;
+                
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.position.z = 10;
+                
+                // Crear líneas conectivas para proyectos
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(50 * 3);
+                
+                for (let i = 0; i < 50; i++) {
+                    const i3 = i * 3;
+                    positions[i3] = (Math.random() - 0.5) * 15;
+                    positions[i3 + 1] = (Math.random() - 0.5) * 15;
+                    positions[i3 + 2] = (Math.random() - 0.5) * 15;
+                }
+                
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                
+                const material = new THREE.LineBasicMaterial({
+                    color: 0x10b981,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                
+                const lines = new THREE.LineSegments(geometry, material);
+                scene.add(lines);
+                
+                this.systems.projects = {
+                    scene, camera, renderer, lines,
+                    originalPositions: positions.slice()
+                };
+            }
+            
+            createExperienceSystem() {
+                const canvas = document.getElementById('experience-canvas');
+                if (!canvas) return;
+                
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.position.z = 12;
+                
+                // Crear partículas de experiencia
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(100 * 3);
+                const colors = new Float32Array(100 * 3);
+                
+                for (let i = 0; i < 100; i++) {
+                    const i3 = i * 3;
+                    positions[i3] = (Math.random() - 0.5) * 25;
+                    positions[i3 + 1] = (Math.random() - 0.5) * 25;
+                    positions[i3 + 2] = (Math.random() - 0.5) * 25;
+                    
+                    colors[i3] = 0.2;
+                    colors[i3 + 1] = 0.6;
+                    colors[i3 + 2] = 0.8;
+                }
+                
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+                
+                const material = new THREE.PointsMaterial({
+                    size: 0.02,
+                    vertexColors: true,
+                    transparent: true,
+                    opacity: 0.5,
+                    blending: THREE.AdditiveBlending
+                });
+                
+                const particleSystem = new THREE.Points(geometry, material);
+                scene.add(particleSystem);
+                
+                this.systems.experience = {
+                    scene, camera, renderer, particleSystem,
+                    originalPositions: positions.slice(),
+                    originalColors: colors.slice()
+                };
+            }
+            
+            createCTASystem() {
+                const canvas = document.getElementById('cta-canvas');
+                if (!canvas) return;
+                
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.position.z = 6;
+                
+                // Crear efectos de llamada a la acción
+                const ctaElements = [];
+                for (let i = 0; i < 8; i++) {
+                    const geometry = new THREE.SphereGeometry(0.1, 8, 6);
+                    const material = new THREE.MeshBasicMaterial({
+                        color: 0xffffff,
+                        transparent: true,
+                        opacity: 0.7
+                    });
+                    
+                    const mesh = new THREE.Mesh(geometry, material);
+                    mesh.position.set(
+                        (Math.random() - 0.5) * 12,
+                        (Math.random() - 0.5) * 12,
+                        (Math.random() - 0.5) * 12
+                    );
+                    
+                    scene.add(mesh);
+                    ctaElements.push(mesh);
+                }
+                
+                this.systems.cta = {
+                    scene, camera, renderer, ctaElements
+                };
+            }
+            
+            setupPostProcessing() {
+                // Configurar render targets para efectos post-procesamiento
+                this.renderTarget = new THREE.WebGLRenderTarget(
+                    window.innerWidth,
+                    window.innerHeight,
+                    {
+                        minFilter: THREE.LinearFilter,
+                        magFilter: THREE.LinearFilter,
+                        format: THREE.RGBAFormat
+                    }
+                );
+            }
+            
+            animate() {
                 requestAnimationFrame(() => this.animate());
                 
-                if (this.particleSystem) {
-                    const positions = this.particleSystem.geometry.attributes.position.array;
-                    const colors = this.particleSystem.geometry.attributes.color.array;
-                    const time = Date.now() * 0.001;
+                const deltaTime = this.clock.getDelta();
+                this.time += deltaTime;
+                
+                // Actualizar mixers de animación
+                this.animationMixers.forEach(mixer => mixer.update(deltaTime));
+                
+                // Suavizar movimiento del mouse
+                this.mouse.x += (this.mouseTarget.x - this.mouse.x) * 0.05;
+                this.mouse.y += (this.mouseTarget.y - this.mouse.y) * 0.05;
+                
+                // Animar sistema hero con transición de texto a partículas
+                if (this.systems.hero) {
+                    const { 
+                        particleSystem, material, positions, targetPositions, 
+                        originalPositions, transitionTime, isTransitioning, particleCount 
+                    } = this.systems.hero;
                     
-                    for (let i = 0; i < this.particleCount; i++) {
-                        const i3 = i * 3;
-                        
-                        // Posición original
-                        const originalX = this.originalPositions[i3];
-                        const originalY = this.originalPositions[i3 + 1];
-                        const originalZ = this.originalPositions[i3 + 2];
-                        
-                        // Influencia del mouse con suavizado
-                        const mouseInfluence = this.mouseInfluence;
-                        const mouseX = this.mouse.x * mouseInfluence;
-                        const mouseY = this.mouse.y * mouseInfluence;
-                        
-                        // Movimiento orgánico y suave
-                        const wave1 = Math.sin(time * 0.5 + i * 0.01) * 0.1;
-                        const wave2 = Math.cos(time * 0.3 + i * 0.02) * 0.05;
-                        const wave3 = Math.sin(time * 0.7 + i * 0.015) * 0.08;
-                        
-                        positions[i3] = originalX + mouseX + wave1;
-                        positions[i3 + 1] = originalY + mouseY + wave2;
-                        positions[i3 + 2] = originalZ + wave3;
-                        
-                        // Efecto de brillo pulsante
-                        const pulse = 0.8 + Math.sin(time * 2 + i * 0.1) * 0.2;
-                        colors[i3 + 1] = this.originalColors[i3 + 1] * pulse;
+                    // Actualizar uniforms del shader
+                    material.uniforms.time.value = this.time;
+                    material.uniforms.mouse.value.set(this.mouse.x, this.mouse.y);
+                    
+                    // Controlar la transición
+                    if (!isTransitioning && this.time > 1.5) {
+                        // Después de 1.5 segundos, comenzar transición
+                        this.systems.hero.isTransitioning = true;
                     }
                     
-                    this.particleSystem.geometry.attributes.position.needsUpdate = true;
-                    this.particleSystem.geometry.attributes.color.needsUpdate = true;
+                    // Mostrar contenido después de que las partículas terminen de dispersarse
+                    if (isTransitioning && this.systems.hero.transitionTime > 0.8) {
+                        this.showHeroContent();
+                    }
                     
-                    // Rotación lenta del sistema completo
-                    this.particleSystem.rotation.y += 0.0005;
-                    this.particleSystem.rotation.x += 0.0002;
+                    if (isTransitioning) {
+                        this.systems.hero.transitionTime += deltaTime * 0.8;
+                        const transition = Math.min(this.systems.hero.transitionTime, 1);
+                        material.uniforms.transition.value = transition;
+                        
+                        // Calcular posiciones objetivo con dispersión más elegante
+                        for (let i = 0; i < particleCount; i++) {
+                            const i3 = i * 3;
+                            const originalX = originalPositions[i3];
+                            const originalY = originalPositions[i3 + 1];
+                            const originalZ = originalPositions[i3 + 2];
+                            
+                            // Crear dispersión más orgánica usando funciones trigonométricas
+                            const angle = (i / particleCount) * Math.PI * 2;
+                            const radius = 3 + Math.sin(i * 0.1) * 2;
+                            const height = Math.cos(i * 0.05) * 1.5;
+                            
+                            const dispersedX = originalX + Math.cos(angle) * radius;
+                            const dispersedY = originalY + Math.sin(angle) * radius + height;
+                            const dispersedZ = originalZ + Math.sin(i * 0.02) * 2;
+                            
+                            // Influencia del mouse más suave
+                            const mouseX = this.mouse.x * 1.5;
+                            const mouseY = this.mouse.y * 1.5;
+                            
+                            // Interpolar con easing suave
+                            const easeTransition = this.easeInOutCubic(transition);
+                            targetPositions[i3] = originalX + (dispersedX - originalX) * easeTransition + mouseX * easeTransition;
+                            targetPositions[i3 + 1] = originalY + (dispersedY - originalY) * easeTransition + mouseY * easeTransition;
+                            targetPositions[i3 + 2] = originalZ + (dispersedZ - originalZ) * easeTransition;
+                        }
+                    }
+                    
+                    // Suavizar movimiento hacia las posiciones objetivo
+                    for (let i = 0; i < particleCount; i++) {
+                        const i3 = i * 3;
+                        positions[i3] += (targetPositions[i3] - positions[i3]) * 0.1;
+                        positions[i3 + 1] += (targetPositions[i3 + 1] - positions[i3 + 1]) * 0.1;
+                        positions[i3 + 2] += (targetPositions[i3 + 2] - positions[i3 + 2]) * 0.1;
+                    }
+                    
+                    particleSystem.geometry.attributes.position.needsUpdate = true;
+                    
+                    // Efectos de cámara dinámicos
+                    this.systems.hero.camera.position.x = Math.sin(this.time * 0.1) * 0.3;
+                    this.systems.hero.camera.position.y = Math.cos(this.time * 0.15) * 0.2;
+                    this.systems.hero.camera.lookAt(0, 0, 0);
+                    
+                    this.systems.hero.renderer.render(this.systems.hero.scene, this.systems.hero.camera);
                 }
                 
-                this.renderer.render(this.scene, this.camera);
+                // Animar sistema skills
+                if (this.systems.skills) {
+                    this.systems.skills.skillElements.forEach((element, index) => {
+                        element.rotation.x += 0.01;
+                        element.rotation.y += 0.01;
+                        element.position.y += Math.sin(this.time + index) * 0.01;
+                    });
+                    this.systems.skills.renderer.render(this.systems.skills.scene, this.systems.skills.camera);
+                }
+                
+                // Animar sistema projects
+                if (this.systems.projects) {
+                    const { lines, originalPositions } = this.systems.projects;
+                    const positions = lines.geometry.attributes.position.array;
+                    
+                    for (let i = 0; i < positions.length; i += 3) {
+                        positions[i + 1] += Math.sin(this.time + i) * 0.01;
+                    }
+                    lines.geometry.attributes.position.needsUpdate = true;
+                    this.systems.projects.renderer.render(this.systems.projects.scene, this.systems.projects.camera);
+                }
+                
+                // Animar sistema experience
+                if (this.systems.experience) {
+                    const { particleSystem, originalPositions, originalColors } = this.systems.experience;
+                    const positions = particleSystem.geometry.attributes.position.array;
+                    const colors = particleSystem.geometry.attributes.color.array;
+                    
+                    for (let i = 0; i < positions.length / 3; i++) {
+                        const i3 = i * 3;
+                        const originalX = originalPositions[i3];
+                        const originalY = originalPositions[i3 + 1];
+                        const originalZ = originalPositions[i3 + 2];
+                        
+                        const wave1 = Math.sin(this.time * 0.3 + i * 0.02) * 0.1;
+                        const wave2 = Math.cos(this.time * 0.4 + i * 0.03) * 0.08;
+                        const wave3 = Math.sin(this.time * 0.6 + i * 0.025) * 0.06;
+                        
+                        positions[i3] = originalX + wave1;
+                        positions[i3 + 1] = originalY + wave2;
+                        positions[i3 + 2] = originalZ + wave3;
+                        
+                        const pulse = 0.7 + Math.sin(this.time * 1.5 + i * 0.05) * 0.3;
+                        colors[i3 + 1] = originalColors[i3 + 1] * pulse;
+                    }
+                    
+                    particleSystem.geometry.attributes.position.needsUpdate = true;
+                    particleSystem.geometry.attributes.color.needsUpdate = true;
+                    this.systems.experience.renderer.render(this.systems.experience.scene, this.systems.experience.camera);
+                }
+                
+                // Animar sistema CTA
+                if (this.systems.cta) {
+                    this.systems.cta.ctaElements.forEach((element, index) => {
+                        element.rotation.x += 0.02;
+                        element.rotation.y += 0.02;
+                        element.position.x += Math.sin(this.time * 0.5 + index) * 0.005;
+                        element.position.y += Math.cos(this.time * 0.3 + index) * 0.005;
+                    });
+                    this.systems.cta.renderer.render(this.systems.cta.scene, this.systems.cta.camera);
+                }
             }
         }
         
-        // Inicializar cuando el DOM esté listo
+        // Inicializar sistema avanzado de animaciones
         document.addEventListener('DOMContentLoaded', () => {
-            // Solo inicializar en la página de inicio
             if (window.location.pathname === '/' || window.location.pathname === '/home') {
-                new ParticleSystem();
+                new AdvancedThreeJSAnimationSystem();
             }
         });
     </script>
