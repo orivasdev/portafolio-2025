@@ -43,6 +43,13 @@ class ProjectController extends Controller
             $validated['image'] = $request->file('image')->store('projects', 'public');
         }
 
+        $validated['is_featured'] = $request->has('is_featured');
+        $validated['is_active'] = $request->has('is_active');
+        $validated['order'] = $validated['order'] ?? 0;
+
+        // Filtrar tecnologías vacías
+        $validated['technologies'] = array_filter($validated['technologies']);
+
         Project::create($validated);
 
         return redirect()->route('admin.projects.index')
@@ -79,10 +86,22 @@ class ProjectController extends Controller
             $validated['image'] = $request->file('image')->store('projects', 'public');
         }
 
+        $validated['is_featured'] = $request->has('is_featured');
+        $validated['is_active'] = $request->has('is_active');
+        $validated['order'] = $validated['order'] ?? 0;
+
+        // Filtrar tecnologías vacías
+        $validated['technologies'] = array_filter($validated['technologies']);
+
         $project->update($validated);
 
         return redirect()->route('admin.projects.index')
             ->with('success', 'Proyecto actualizado correctamente.');
+    }
+
+    public function show(Project $project): View
+    {
+        return view('admin.projects.show', compact('project'));
     }
 
     public function destroy(Project $project): RedirectResponse
@@ -95,5 +114,25 @@ class ProjectController extends Controller
 
         return redirect()->route('admin.projects.index')
             ->with('success', 'Proyecto eliminado correctamente.');
+    }
+
+    public function toggleFeatured(Project $project): RedirectResponse
+    {
+        $project->update(['is_featured' => !$project->is_featured]);
+
+        $status = $project->is_featured ? 'destacado' : 'no destacado';
+        
+        return redirect()->back()
+            ->with('success', "Proyecto marcado como {$status} exitosamente.");
+    }
+
+    public function toggleActive(Project $project): RedirectResponse
+    {
+        $project->update(['is_active' => !$project->is_active]);
+
+        $status = $project->is_active ? 'activado' : 'desactivado';
+        
+        return redirect()->back()
+            ->with('success', "Proyecto {$status} exitosamente.");
     }
 }

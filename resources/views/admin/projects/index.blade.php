@@ -1,156 +1,229 @@
-@extends('layouts.app')
+@extends('admin.layout')
 
-@section('title', 'Administrar Proyectos')
-@section('description', 'Panel de administración para gestionar proyectos del portafolio')
+@section('title', 'Proyectos')
+@section('page-title', 'Gestión de Proyectos')
+@section('page-description', 'Administra todos los proyectos de tu portafolio')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-    <!-- Header -->
-    <div class="bg-white dark:bg-gray-800 shadow">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Administrar Proyectos</h1>
-                    <p class="text-gray-600 dark:text-gray-300">Gestiona todos los proyectos del portafolio</p>
+<!-- Header Section - Figma Style -->
+<div class="mb-8">
+    <div class="figma-card p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <i data-feather="folder" class="h-6 w-6 text-blue-600"></i>
                 </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">Proyectos</h2>
+                    <p class="text-gray-600">{{ $projects->total() }} proyectos en total</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <!-- Filter Dropdown -->
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i data-feather="filter" class="h-4 w-4 mr-2"></i>
+                        Filtrar
+                    </button>
+                </div>
+                
+                <!-- Add New Button -->
                 <a href="{{ route('admin.projects.create') }}" 
-                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
+                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                    <i data-feather="plus" class="h-4 w-4 mr-2"></i>
                     Nuevo Proyecto
                 </a>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        @if(session('success'))
-            <div class="mb-6 bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-300 px-4 py-3 rounded-lg">
-                {{ session('success') }}
+<!-- Projects Grid/Table - Figma Style -->
+<div class="figma-card overflow-hidden">
+    <!-- Table Header -->
+    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <h3 class="text-lg font-semibold text-gray-900">Lista de Proyectos</h3>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {{ $projects->total() }} total
+                </span>
             </div>
-        @endif
-
-        <!-- Projects Table -->
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Proyecto
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Categoría
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Estado
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Orden
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Acciones
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        @forelse($projects as $project)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-12 w-12">
-                                        @if($project->image)
-                                            <img class="h-12 w-12 rounded-lg object-cover" src="{{ $project->image_url }}" alt="{{ $project->title }}">
-                                        @else
-                                            <div class="h-12 w-12 rounded-lg bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-                                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                                                </svg>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $project->title }}
-                                        </div>
-                                        <div class="text-sm text-gray-500 dark:text-gray-400">
-                                            {{ Str::limit($project->short_description, 50) }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200">
-                                    {{ $project->category }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center space-x-2">
-                                    @if($project->is_active)
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
-                                            Activo
-                                        </span>
-                                    @else
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200">
-                                            Inactivo
-                                        </span>
-                                    @endif
-                                    
-                                    @if($project->is_featured)
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200">
-                                            Destacado
-                                        </span>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                {{ $project->order }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex space-x-2">
-                                    <a href="{{ route('admin.projects.edit', $project) }}" 
-                                       class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                        </svg>
-                                    </a>
-                                    <form action="{{ route('admin.projects.destroy', $project) }}" method="POST" 
-                                          onsubmit="return confirm('¿Estás seguro de que quieres eliminar este proyecto?')" 
-                                          class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                            </svg>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                                <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33"></path>
-                                </svg>
-                                <p class="text-lg font-medium">No hay proyectos</p>
-                                <p class="text-sm">Comienza creando tu primer proyecto</p>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+            <div class="flex items-center space-x-2">
+                <button class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                    <i data-feather="grid" class="h-4 w-4"></i>
+                </button>
+                <button class="p-2 text-gray-600 bg-gray-100 rounded-lg">
+                    <i data-feather="list" class="h-4 w-4"></i>
+                </button>
             </div>
-            
-            @if($projects->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                {{ $projects->links() }}
-            </div>
-            @endif
         </div>
     </div>
+    
+    <!-- Table Content -->
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-100">
+            <thead class="bg-gray-50/30">
+                <tr>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Proyecto
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Categoría
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Estado
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Orden
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-50">
+                @forelse($projects as $project)
+                <tr class="hover:bg-blue-50/30 transition-colors group">
+                    <td class="px-6 py-5">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-shrink-0">
+                                @if($project->image)
+                                    <img class="h-12 w-12 rounded-xl object-cover shadow-sm" src="{{ $project->image_url }}" alt="{{ $project->title }}">
+                                @else
+                                    <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                                        <i data-feather="image" class="h-5 w-5 text-gray-400"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+                                    {{ $project->title }}
+                                </p>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    {{ Str::limit($project->short_description, 60) }}
+                                </p>
+                                <div class="flex items-center mt-2 space-x-1">
+                                    @foreach(array_slice($project->technologies_list, 0, 3) as $tech)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
+                                            {{ $tech }}
+                                        </span>
+                                    @endforeach
+                                    @if(count($project->technologies_list) > 3)
+                                        <span class="text-xs text-gray-400">+{{ count($project->technologies_list) - 3 }} más</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                            {{ $project->category }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="space-y-2">
+                            <div class="flex items-center space-x-2">
+                                @if($project->is_active)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                                        <i data-feather="check-circle" class="h-3 w-3 mr-1"></i>
+                                        Activo
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                                        <i data-feather="x-circle" class="h-3 w-3 mr-1"></i>
+                                        Inactivo
+                                    </span>
+                                @endif
+                                
+                                @if($project->is_featured)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
+                                        <i data-feather="star" class="h-3 w-3 mr-1"></i>
+                                        Destacado
+                                    </span>
+                                @endif
+                            </div>
+                            
+                            <div class="flex items-center space-x-2">
+                                <form action="{{ route('admin.projects.toggle-active', $project) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                                        {{ $project->is_active ? 'Desactivar' : 'Activar' }}
+                                    </button>
+                                </form>
+                                <span class="text-gray-300">•</span>
+                                <form action="{{ route('admin.projects.toggle-featured', $project) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                                        {{ $project->is_featured ? 'No destacar' : 'Destacar' }}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 text-sm font-semibold text-gray-700">
+                            {{ $project->order }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="flex items-center justify-end space-x-2">
+                            <a href="{{ route('admin.projects.show', $project) }}" 
+                               class="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors" title="Ver">
+                                <i data-feather="eye" class="h-4 w-4"></i>
+                            </a>
+                            <a href="{{ route('admin.projects.edit', $project) }}" 
+                               class="p-2 text-gray-400 hover:text-green-600 rounded-lg hover:bg-green-50 transition-colors" title="Editar">
+                                <i data-feather="edit-2" class="h-4 w-4"></i>
+                            </a>
+                            <form action="{{ route('admin.projects.destroy', $project) }}" method="POST" 
+                                  onsubmit="return confirm('¿Estás seguro de que quieres eliminar este proyecto?')" 
+                                  class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors" title="Eliminar">
+                                    <i data-feather="trash-2" class="h-4 w-4"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="5" class="px-6 py-16 text-center">
+                        <div class="flex flex-col items-center">
+                            <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
+                                <i data-feather="folder-plus" class="h-8 w-8 text-gray-400"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">No hay proyectos</h3>
+                            <p class="text-sm text-gray-500 mb-6 max-w-sm">
+                                Comienza agregando tu primer proyecto para mostrar tu trabajo
+                            </p>
+                            <a href="{{ route('admin.projects.create') }}" 
+                               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                                <i data-feather="plus" class="h-4 w-4 mr-2"></i>
+                                Crear primer proyecto
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination - Figma Style -->
+    @if($projects->hasPages())
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/30">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center text-sm text-gray-500">
+                    Mostrando {{ $projects->firstItem() }} a {{ $projects->lastItem() }} de {{ $projects->total() }} resultados
+                </div>
+                <div class="flex items-center space-x-2">
+                    {{ $projects->links() }}
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
 @endsection

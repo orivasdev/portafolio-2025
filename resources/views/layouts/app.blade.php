@@ -29,6 +29,23 @@
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
+    <!-- Three.js Animation Systems Base -->
+    <script src="{{ asset('js/threejs/hero-animation.js') }}"></script>
+    <script src="{{ asset('js/threejs/image-particles.js') }}"></script>
+    <script src="{{ asset('js/threejs/portrait-particles.js') }}"></script>
+    <script src="{{ asset('js/threejs/skills-animation.js') }}"></script>
+    <script src="{{ asset('js/threejs/projects-animation.js') }}"></script>
+    <script src="{{ asset('js/threejs/experience-animation.js') }}"></script>
+    <script src="{{ asset('js/threejs/cta-animation.js') }}"></script>
+    
+    <!-- Three.js Enhanced Systems -->
+    <script src="{{ asset('js/threejs/image-particles-enhanced.js') }}"></script>
+    <script src="{{ asset('js/threejs/particle-control-panel.js') }}"></script>
+    <script src="{{ asset('js/threejs/audio-reactive-particles.js') }}"></script>
+    
+    <!-- Main System -->
+    <script src="{{ asset('js/main.js') }}"></script>
+    
     <!-- Heroicons -->
     <script src="https://unpkg.com/@heroicons/v2/24/outline/esm/index.js"></script>
 </head>
