@@ -49,7 +49,7 @@
     <!-- Heroicons -->
     <script src="https://unpkg.com/@heroicons/v2/24/outline/esm/index.js"></script>
 </head>
-<body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': darkMode }">
+<body class="font-sans antialiased bg-gray-900 text-gray-100 dark transition-colors duration-300">
     
     <!-- Header -->
     @include('partials.header')
@@ -62,19 +62,10 @@
     <!-- Footer -->
     @include('partials.footer')
     
-    <!-- Theme Toggle Script -->
+    <!-- Modo oscuro por defecto - sin toggle -->
     <script>
-        // Theme toggle functionality
-        function toggleDarkMode() {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('darkMode', isDark);
-            return isDark;
-        }
-        
-        // Initialize theme
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.documentElement.classList.add('dark');
-        }
+        // Forzar modo oscuro siempre
+        document.documentElement.classList.add('dark');
     </script>
     
     <!-- Flash Messages -->

@@ -213,27 +213,163 @@
             </div>
         </div>
 
-        <!-- Mobile menu button -->
-        <div class="sticky top-0 z-40 flex items-center gap-x-6 sidebar-gradient px-4 py-4 shadow-lg sm:px-6 lg:hidden">
-            <button type="button" class="-m-2.5 p-2.5 text-white lg:hidden" @click="sidebarOpen = !sidebarOpen">
-                <span class="sr-only">Abrir sidebar</span>
-                <i data-feather="menu" class="h-6 w-6"></i>
-            </button>
-            <div class="flex-1 text-lg font-bold leading-6 text-white">Panel de Administración</div>
+        <!-- Mobile Header Bar -->
+        <div class="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200 lg:hidden">
+            <div class="flex items-center justify-between px-4 py-3">
+                <div class="flex items-center space-x-3">
+                    <button type="button" @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <span class="sr-only">Abrir menú</span>
+                        <i data-feather="menu" class="h-6 w-6"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-lg font-semibold text-gray-900">@yield('page-title', 'CMS Panel')</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <!-- Notifications for mobile -->
+                    <button class="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 relative">
+                        <i data-feather="bell" class="h-5 w-5"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Mobile sidebar overlay -->
-        <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 lg:hidden" style="display: none;">
+        <div x-show="sidebarOpen" 
+             x-transition:enter="transition-opacity ease-linear duration-300" 
+             x-transition:enter-start="opacity-0" 
+             x-transition:enter-end="opacity-100" 
+             x-transition:leave="transition-opacity ease-linear duration-300" 
+             x-transition:leave-start="opacity-100" 
+             x-transition:leave-end="opacity-0" 
+             class="fixed inset-0 z-50 lg:hidden" 
+             style="display: none;">
+            
+            <!-- Backdrop -->
             <div class="fixed inset-0 bg-gray-900/80" @click="sidebarOpen = false"></div>
-            <div class="fixed inset-y-0 left-0 z-50 w-full overflow-y-auto sidebar-gradient px-6 pb-4 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 slide-in-left">
-                <!-- Mobile sidebar content (same as desktop) -->
+            
+            <!-- Sidebar -->
+            <div class="fixed inset-y-0 left-0 z-50 w-full max-w-xs overflow-y-auto figma-sidebar">
+                <div class="flex grow flex-col">
+                    <!-- Mobile Logo/Header -->
+                    <div class="flex h-16 items-center px-6 border-b border-white/10">
+                        <div class="flex items-center justify-between w-full">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                                    <i data-feather="layers" class="h-5 w-5 text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <h1 class="text-white text-lg font-semibold">CMS Panel</h1>
+                                    <p class="text-blue-200 text-xs">Mi Portafolio</p>
+                                </div>
+                            </div>
+                            <button @click="sidebarOpen = false" class="p-1 rounded-md text-white/70 hover:text-white">
+                                <i data-feather="x" class="h-5 w-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile User Profile -->
+                    <div class="px-6 py-4 border-b border-white/10">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                                <i data-feather="user" class="h-5 w-5 text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-white text-sm font-medium">Administrador</p>
+                                <p class="text-blue-200 text-xs">admin@portafolio.com</p>
+                            </div>
+                            <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile Navigation -->
+                    <nav class="flex-1 px-6 py-4">
+                        <div class="space-y-2">
+                            <!-- Dashboard -->
+                            <a href="{{ route('admin.dashboard') }}" 
+                               @click="sidebarOpen = false"
+                               class="figma-nav-item @if(request()->routeIs('admin.dashboard')) active @endif flex items-center px-3 py-3 text-sm font-medium text-white">
+                                <i data-feather="home" class="mr-3 h-5 w-5"></i>
+                                <span>Dashboard</span>
+                                @if(request()->routeIs('admin.dashboard'))
+                                    <span class="ml-auto w-2 h-2 bg-white rounded-full"></span>
+                                @endif
+                            </a>
+                            
+                            <!-- Proyectos -->
+                            <a href="{{ route('admin.projects.index') }}" 
+                               @click="sidebarOpen = false"
+                               class="figma-nav-item @if(request()->routeIs('admin.projects.*')) active @endif flex items-center px-3 py-3 text-sm font-medium text-white">
+                                <i data-feather="folder" class="mr-3 h-5 w-5"></i>
+                                <span>Proyectos</span>
+                                @if(request()->routeIs('admin.projects.*'))
+                                    <span class="ml-auto w-2 h-2 bg-white rounded-full"></span>
+                                @endif
+                            </a>
+                            
+                            <!-- Habilidades -->
+                            <a href="{{ route('admin.skills.index') }}" 
+                               @click="sidebarOpen = false"
+                               class="figma-nav-item @if(request()->routeIs('admin.skills.*')) active @endif flex items-center px-3 py-3 text-sm font-medium text-white">
+                                <i data-feather="star" class="mr-3 h-5 w-5"></i>
+                                <span>Habilidades</span>
+                                @if(request()->routeIs('admin.skills.*'))
+                                    <span class="ml-auto w-2 h-2 bg-white rounded-full"></span>
+                                @endif
+                            </a>
+                            
+                            <!-- Experiencias -->
+                            <a href="{{ route('admin.experiences.index') }}" 
+                               @click="sidebarOpen = false"
+                               class="figma-nav-item @if(request()->routeIs('admin.experiences.*')) active @endif flex items-center px-3 py-3 text-sm font-medium text-white">
+                                <i data-feather="briefcase" class="mr-3 h-5 w-5"></i>
+                                <span>Experiencias</span>
+                                @if(request()->routeIs('admin.experiences.*'))
+                                    <span class="ml-auto w-2 h-2 bg-white rounded-full"></span>
+                                @endif
+                            </a>
+                            
+                            <!-- Contactos -->
+                            <a href="{{ route('admin.contacts.index') }}" 
+                               @click="sidebarOpen = false"
+                               class="figma-nav-item @if(request()->routeIs('admin.contacts.*')) active @endif flex items-center px-3 py-3 text-sm font-medium text-white">
+                                <i data-feather="mail" class="mr-3 h-5 w-5"></i>
+                                <span>Contactos</span>
+                                @if(request()->routeIs('admin.contacts.*'))
+                                    <span class="ml-auto w-2 h-2 bg-white rounded-full"></span>
+                                @endif
+                            </a>
+                        </div>
+                    </nav>
+                    
+                    <!-- Mobile Bottom Actions -->
+                    <div class="px-6 py-4 border-t border-white/10 mt-auto">
+                        <div class="space-y-2">
+                            <a href="{{ route('home') }}" target="_blank"
+                               class="figma-nav-item flex items-center px-3 py-3 text-sm font-medium text-white">
+                                <i data-feather="external-link" class="mr-3 h-5 w-5"></i>
+                                <span>Ver Sitio Web</span>
+                            </a>
+                            
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full figma-nav-item flex items-center px-3 py-3 text-sm font-medium text-white hover:bg-red-500/20">
+                                    <i data-feather="log-out" class="mr-3 h-5 w-5"></i>
+                                    <span>Cerrar Sesión</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Main content - Figma Style -->
         <main class="lg:pl-72">
-            <!-- Top Header Bar -->
-            <div class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-4">
+            <!-- Top Header Bar - Desktop Only -->
+            <div class="hidden lg:block sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-4">
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-xl font-semibold text-gray-900">@yield('page-title', 'Dashboard')</h1>
@@ -259,7 +395,7 @@
             </div>
             
             <!-- Content Area -->
-            <div class="px-6 py-6">
+            <div class="px-4 py-4 lg:px-6 lg:py-6">
                 <!-- Alerts mejoradas -->
                 @if(session('success'))
                     <div class="mb-6 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 p-4 shadow-lg border border-green-200 fade-in" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)">
@@ -306,13 +442,80 @@
                 @yield('content')
             </div>
         </main>
+        
+        <!-- Mobile FAB (Floating Action Button) -->
+        <div class="lg:hidden fixed bottom-6 right-6 z-40">
+            <div x-data="{ open: false }" class="relative">
+                <!-- Main FAB -->
+                <button @click="open = !open" 
+                        class="w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center">
+                    <i data-feather="plus" class="h-6 w-6" x-show="!open"></i>
+                    <i data-feather="x" class="h-6 w-6" x-show="open" style="display: none;"></i>
+                </button>
+                
+                <!-- FAB Menu -->
+                <div x-show="open" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 scale-95"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 scale-100"
+                     x-transition:leave-end="opacity-0 scale-95"
+                     class="absolute bottom-16 right-0 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2"
+                     style="display: none;">
+                    
+                    <a href="{{ route('admin.projects.create') }}" 
+                       class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                        <i data-feather="folder-plus" class="h-4 w-4 mr-3 text-blue-600"></i>
+                        Nuevo Proyecto
+                    </a>
+                    
+                    <a href="{{ route('admin.skills.create') }}" 
+                       class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors">
+                        <i data-feather="star" class="h-4 w-4 mr-3 text-green-600"></i>
+                        Nueva Habilidad
+                    </a>
+                    
+                    <a href="{{ route('admin.experiences.create') }}" 
+                       class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors">
+                        <i data-feather="briefcase" class="h-4 w-4 mr-3 text-purple-600"></i>
+                        Nueva Experiencia
+                    </a>
+                    
+                    <div class="border-t border-gray-100 my-1"></div>
+                    
+                    <a href="{{ route('admin.contacts.index') }}" 
+                       class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 transition-colors">
+                        <i data-feather="mail" class="h-4 w-4 mr-3 text-orange-600"></i>
+                        Ver Contactos
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        function toggleSidebar() {
-            // Mobile sidebar toggle functionality can be added here
-            console.log('Toggle sidebar');
-        }
+        // Mobile responsive enhancements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-close mobile sidebar when clicking on content
+            const main = document.querySelector('main');
+            if (main) {
+                main.addEventListener('click', function() {
+                    // Close sidebar if open on mobile
+                    if (window.innerWidth < 1024) {
+                        Alpine.store('sidebarOpen', false);
+                    }
+                });
+            }
+            
+            // Handle orientation change
+            window.addEventListener('orientationchange', function() {
+                setTimeout(function() {
+                    // Recalculate layout after orientation change
+                    window.dispatchEvent(new Event('resize'));
+                }, 100);
+            });
+        });
     </script>
 </body>
 </html>

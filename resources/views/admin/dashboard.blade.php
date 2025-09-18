@@ -33,8 +33,8 @@
     </div>
 </div>
 
-<!-- Stats Cards - Figma Design -->
-<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+<!-- Stats Cards - Mobile Responsive -->
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6 lg:mb-8">
     <!-- Proyectos -->
     <div class="figma-stat-card group cursor-pointer">
         <div class="flex items-center justify-between mb-4">
