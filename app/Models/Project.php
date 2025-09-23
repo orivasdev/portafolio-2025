@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Project extends Model
 {
@@ -18,7 +19,7 @@ class Project extends Model
         'github_url',
         'live_url',
         'technologies',
-        'category',
+        'category_id',
         'order',
         'is_featured',
         'is_active'
@@ -42,7 +43,14 @@ class Project extends Model
 
     public function scopeByCategory(Builder $query, string $category): void
     {
-        $query->where('category', $category);
+        $query->whereHas('category', function ($q) use ($category) {
+            $q->where('slug', $category);
+        });
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function getImageUrlAttribute(): string
@@ -56,5 +64,10 @@ class Project extends Model
     public function getTechnologiesListAttribute(): array
     {
         return $this->technologies ?? [];
+    }
+
+    public function getCategoryNameAttribute(): string
+    {
+        return $this->category ? $this->category->name : 'Sin categoría';
     }
 }

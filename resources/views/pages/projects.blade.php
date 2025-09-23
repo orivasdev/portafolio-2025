@@ -31,10 +31,10 @@
                             Todos
                         </button>
                         @foreach($categories as $category)
-                        <button @click="setCategory('{{ $category }}')" 
-                                :class="selectedCategory === '{{ $category }}' ? 'bg-primary-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
+                        <button @click="setCategory('{{ $category->slug }}')" 
+                                :class="selectedCategory === '{{ $category->slug }}' ? 'bg-primary-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
                                 class="px-4 py-2 rounded-lg font-medium transition-colors duration-200 hover:bg-primary-600 hover:text-white">
-                            {{ $category }}
+                            {{ $category->icon_emoji }} {{ $category->name }}
                         </button>
                         @endforeach
                     </div>
@@ -89,9 +89,16 @@
                             
                             <!-- Category Badge -->
                             <div class="absolute top-4 right-4">
-                                <span class="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
-                                    {{ $project->category }}
-                                </span>
+                                @if($project->category)
+                                    <span class="px-3 py-1 text-white text-xs font-medium rounded-full"
+                                          style="background-color: {{ $project->category->color }};">
+                                        {{ $project->category->icon_emoji }} {{ $project->category->name }}
+                                    </span>
+                                @else
+                                    <span class="px-3 py-1 bg-gray-600 text-white text-xs font-medium rounded-full">
+                                        🔧 Sin categoría
+                                    </span>
+                                @endif
                             </div>
                         </div>
                         

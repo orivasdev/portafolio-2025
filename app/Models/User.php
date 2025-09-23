@@ -21,6 +21,15 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'bio',
+        'title',
+        'location',
+        'phone',
+        'website',
+        'linkedin',
+        'github',
+        'twitter',
+        'avatar',
     ];
 
     /**
@@ -44,5 +53,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getAvatarUrlAttribute(): string
+    {
+        if ($this->avatar && !str_starts_with($this->avatar, 'http')) {
+            return asset('storage/' . $this->avatar);
+        }
+        return $this->avatar ?? asset('images/default-avatar.png');
     }
 }

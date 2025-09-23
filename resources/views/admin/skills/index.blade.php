@@ -52,9 +52,6 @@
                                 Categoría
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Nivel
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Estado
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -90,22 +87,16 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                                    {{ ucfirst($skill->category) }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="flex-1">
-                                        <div class="flex items-center">
-                                            <div class="w-16 bg-gray-200 rounded-full h-2">
-                                                <div class="bg-indigo-600 h-2 rounded-full" style="width: {{ $skill->level_percentage }}%"></div>
-                                            </div>
-                                            <span class="ml-2 text-sm text-gray-600">{{ $skill->level }}/5</span>
-                                        </div>
-                                        <div class="text-xs text-gray-500 mt-1">{{ $skill->level_text }}</div>
-                                    </div>
-                                </div>
+                                @if($skill->category)
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border"
+                                          style="background-color: {{ $skill->category->color }}20; color: {{ $skill->category->color }}; border-color: {{ $skill->category->color }}40;">
+                                        {{ $skill->category->icon_emoji }} {{ $skill->category->name }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                                        🔧 Sin categoría
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex flex-col space-y-1">

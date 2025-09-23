@@ -1,0 +1,23 @@
+---
+description: Configuración de base de datos para el portafolio
+globs:
+alwaysApply: true
+---
+
+## Configuración de Base de Datos
+
+**Servidor:** XAMPP
+**Usuario:** root
+**Contraseña:** (sin contraseña)
+**Base de datos:** portafolio
+
+### Conexión directa
+- Host: localhost
+- Puerto: 3306 (MySQL por defecto)
+- Usuario: root
+- Contraseña: (vacía)
+- Base de datos: portafolio
+
+### Notas importantes
+- Se pueden hacer consultas directas a la base de datos
+- Usar esta configuración para tareas de administración y desarrollo

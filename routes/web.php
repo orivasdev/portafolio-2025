@@ -25,6 +25,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::resource('projects', AdminProjectController::class);
     Route::post('projects/{project}/toggle-featured', [AdminProjectController::class, 'toggleFeatured'])->name('projects.toggle-featured');
     Route::post('projects/{project}/toggle-active', [AdminProjectController::class, 'toggleActive'])->name('projects.toggle-active');
+    Route::post('projects/{project}/restore', [AdminProjectController::class, 'restore'])->name('projects.restore');
     
     // Gestión de habilidades
     Route::resource('skills', AdminSkillController::class);
@@ -41,6 +42,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('contacts/{contact}/mark-read', [AdminContactController::class, 'markRead'])->name('contacts.mark-read');
     Route::post('contacts/{contact}/mark-replied', [AdminContactController::class, 'markReplied'])->name('contacts.mark-replied');
     Route::delete('contacts/{contact}', [AdminContactController::class, 'destroy'])->name('contacts.destroy');
+    
+    // Gestión de perfil
+    Route::get('profile', [App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
+    Route::get('profile/edit', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('profile', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+    Route::get('profile/change-password', [App\Http\Controllers\Admin\ProfileController::class, 'changePassword'])->name('profile.change-password');
+    Route::put('profile/password', [App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])->name('profile.update-password');
 });
 
 // Rutas de autenticación básicas

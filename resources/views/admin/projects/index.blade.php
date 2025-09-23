@@ -84,7 +84,18 @@
                             <div class="flex items-start justify-between">
                                 <div class="flex-1">
                                     <h4 class="text-sm font-semibold text-gray-900 truncate">{{ $project->title }}</h4>
-                                    <p class="text-xs text-gray-500 mt-1">{{ $project->category }}</p>
+                                    <div class="flex items-center mt-1">
+                                        @if($project->category)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" 
+                                                  style="background-color: {{ $project->category->color }}20; color: {{ $project->category->color }};">
+                                                {{ $project->category->icon_emoji }} {{ $project->category->name }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                                🔧 Sin categoría
+                                            </span>
+                                        @endif
+                                    </div>
                                     <p class="text-sm text-gray-600 mt-1 line-clamp-2">{{ Str::limit($project->short_description, 80) }}</p>
                                 </div>
                                 
@@ -241,9 +252,16 @@
                         </div>
                     </td>
                     <td class="px-6 py-5">
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
-                            {{ $project->category }}
-                        </span>
+                        @if($project->category)
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border" 
+                                  style="background-color: {{ $project->category->color }}20; color: {{ $project->category->color }}; border-color: {{ $project->category->color }}40;">
+                                {{ $project->category->icon_emoji }} {{ $project->category->name }}
+                            </span>
+                        @else
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                                🔧 Sin categoría
+                            </span>
+                        @endif
                     </td>
                     <td class="px-6 py-5">
                         <div class="space-y-2">

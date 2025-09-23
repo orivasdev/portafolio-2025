@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Skill extends Model
 {
@@ -12,8 +13,7 @@ class Skill extends Model
 
     protected $fillable = [
         'name',
-        'category',
-        'level',
+        'category_id',
         'icon',
         'description',
         'order',
@@ -21,7 +21,6 @@ class Skill extends Model
     ];
 
     protected $casts = [
-        'level' => 'integer',
         'is_active' => 'boolean',
     ];
 
@@ -32,7 +31,9 @@ class Skill extends Model
 
     public function scopeByCategory(Builder $query, string $category): void
     {
-        $query->where('category', $category);
+        $query->whereHas('category', function ($q) use ($category) {
+            $q->where('slug', $category);
+        });
     }
 
     public function scopeOrdered(Builder $query): void
@@ -40,20 +41,13 @@ class Skill extends Model
         $query->orderBy('order')->orderBy('name');
     }
 
-    public function getLevelPercentageAttribute(): int
+    public function category(): BelongsTo
     {
-        return ($this->level / 5) * 100;
+        return $this->belongsTo(SkillCategory::class);
     }
 
-    public function getLevelTextAttribute(): string
+    public function getCategoryNameAttribute(): string
     {
-        return match($this->level) {
-            1 => 'Básico',
-            2 => 'Intermedio Bajo',
-            3 => 'Intermedio',
-            4 => 'Intermedio Alto',
-            5 => 'Avanzado',
-            default => 'Básico'
-        };
+        return $this->category ? $this->category->name : 'Sin categoría';
     }
 }

@@ -154,9 +154,16 @@
                             </div>
                         @endif
                         <div class="absolute top-4 right-4">
-                            <span class="px-3 py-1 bg-accent-500 text-white text-xs font-medium rounded-full">
-                                {{ $project->category }}
-                            </span>
+                            @if($project->category)
+                                <span class="px-3 py-1 text-white text-xs font-medium rounded-full"
+                                      style="background-color: {{ $project->category->color }};">
+                                    {{ $project->category->icon_emoji }} {{ $project->category->name }}
+                                </span>
+                            @else
+                                <span class="px-3 py-1 bg-gray-600 text-white text-xs font-medium rounded-full">
+                                    🔧 Sin categoría
+                                </span>
+                            @endif
                         </div>
                     </div>
                     <div class="p-6">
